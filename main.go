@@ -14,6 +14,10 @@ func main() {
 	http.HandleFunc("/", handlers.GalleryHandler)
 	http.HandleFunc("/upload", handlers.UploadHandler)
 	http.HandleFunc("/qr", handlers.QRCodeHandler)
+	http.HandleFunc("/clear", handlers.ClearHandler)
+	http.HandleFunc("/login", handlers.LoginHandler)
+	http.HandleFunc("/logout", handlers.LogoutHandler)
+	http.HandleFunc("/like", handlers.LikeHandler)
 
 	fmt.Println("Server starting on port 8080...")
 	if err := http.ListenAndServe(":8080", nil); err != nil {

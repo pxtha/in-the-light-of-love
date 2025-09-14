@@ -16,11 +16,12 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(10 << 20) // 10 MB
 
-	name := r.FormValue("name")
-	if name == "" {
-		http.Error(w, "Name is required", http.StatusBadRequest)
+	cookie, err := r.Cookie("username")
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
+	name := cookie.Value
 
 	files := r.MultipartForm.File["photos"]
 	for _, fileHeader := range files {

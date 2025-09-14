@@ -21,7 +21,7 @@ push:
 # Run the application using Docker Compose
 run:
 	docker-compose pull
-	docker-compose up -d
+	docker-compose up --build --force-recreate -d
 
 # Stop and remove the application containers
 down:

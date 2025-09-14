@@ -9,7 +9,8 @@ import (
 )
 
 type PageData struct {
-	Gallery map[string][]string
+	Username string
+	Gallery  map[string][]Photo
 }
 
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +20,7 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gallery := make(map[string][]string)
+	gallery := make(map[string][]Photo)
 	uploadDir := "uploads"
 
 	err = filepath.Walk(uploadDir, func(path string, info os.FileInfo, err error) error {
@@ -30,7 +31,14 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 			parts := strings.Split(info.Name(), "_")
 			if len(parts) > 1 {
 				uploaderName := parts[0]
-				gallery[uploaderName] = append(gallery[uploaderName], info.Name())
+				likesMutex.Lock()
+				likes := photoLikes[info.Name()]
+				likesMutex.Unlock()
+				photo := Photo{
+					Filename: info.Name(),
+					Likes:    likes,
+				}
+				gallery[uploaderName] = append(gallery[uploaderName], photo)
 			}
 		}
 		return nil
@@ -41,8 +49,15 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	username := ""
+	cookie, err := r.Cookie("username")
+	if err == nil {
+		username = cookie.Value
+	}
+
 	data := PageData{
-		Gallery: gallery,
+		Username: username,
+		Gallery:  gallery,
 	}
 
 	tmpl.Execute(w, data)

@@ -51,12 +51,14 @@
             <h1 class="text-5xl font-serif text-ivory-white">In the Light of Love</h1>
         </header>
 
+        {{if .Username}}
+        <div class="text-center mb-8">
+            <p class="text-xl text-ivory-white">Welcome, {{.Username}}!</p>
+            <a href="/logout" class="text-bright-red hover:text-candlelight-yellow">Logout</a>
+        </div>
+
         <section class="upload-section mb-12">
             <form action="/upload" method="post" enctype="multipart/form-data" class="bg-deep-black p-8 rounded-lg shadow-lg">
-                <div class="mb-4">
-                    <label for="name" class="block text-ivory-white mb-2">Your Name</label>
-                    <input type="text" id="name" name="name" class="input input-bordered w-full bg-ivory-white text-deep-black" required>
-                </div>
                 <div class="mb-4">
                     <label for="photos" class="block text-ivory-white mb-2">Upload Photos</label>
                     <input type="file" id="photos" name="photos" class="file-input file-input-bordered w-full bg-ivory-white text-deep-black" multiple accept="image/*" required>
@@ -64,15 +66,33 @@
                 <button type="submit" class="btn bg-bright-red text-ivory-white hover:bg-candlelight-yellow hover:text-deep-black w-full">Submit</button>
             </form>
         </section>
+        {{else}}
+        <section class="login-section mb-12">
+            <form action="/login" method="post" class="bg-deep-black p-8 rounded-lg shadow-lg">
+                <div class="mb-4">
+                    <label for="name" class="block text-ivory-white mb-2">Enter Your Name to Continue</label>
+                    <input type="text" id="name" name="name" class="input input-bordered w-full bg-ivory-white text-deep-black" required>
+                </div>
+                <button type="submit" class="btn bg-bright-red text-ivory-white hover:bg-candlelight-yellow hover:text-deep-black w-full">Enter</button>
+            </form>
+        </section>
+        {{end}}
 
         <section class="gallery-section">
             {{range $uploader, $photos := .Gallery}}
             <div class="mb-8">
                 <h2 class="text-2xl font-serif bg-velvet-red text-ivory-white p-4 rounded-t-lg">{{$uploader}}</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-deep-black rounded-b-lg">
-                    {{range $photos}}
-                    <div class="gallery-item">
-                        <img src="/uploads/{{.}}" alt="Photo by {{$uploader}}" class="w-full h-auto object-cover">
+                    {{range .}}
+                    <div class="gallery-item card bg-base-100 shadow-xl">
+                        <figure><img src="/uploads/{{.Filename}}" alt="Photo by {{$uploader}}" class="w-full h-auto object-cover"></figure>
+                        <div class="card-body p-4">
+                            <div class="flex justify-between items-center">
+                                <button onclick="likeImage(this, '{{.Filename}}')" class="btn btn-sm btn-outline btn-accent">❤ <span class="like-count">{{.Likes}}</span></button>
+                                <a href="/uploads/{{.Filename}}" download class="btn btn-sm btn-outline">Download</a>
+                                <button onclick="shareImage('{{.Filename}}')" class="btn btn-sm btn-outline">Share</button>
+                            </div>
+                        </div>
                     </div>
                     {{end}}
                 </div>
@@ -80,11 +100,52 @@
             {{end}}
         </section>
 
+        <script>
+            function likeImage(button, filename) {
+                const formData = new FormData();
+                formData.append('filename', filename);
+
+                fetch('/like', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    button.querySelector('.like-count').textContent = data.likes;
+                })
+                .catch(error => console.error('Error:', error));
+            }
+
+            function shareImage(filename) {
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'In the Light of Love',
+                        text: 'Check out this photo!',
+                        url: window.location.origin + '/uploads/' + filename,
+                    })
+                    .then(() => console.log('Successful share'))
+                    .catch((error) => console.log('Error sharing', error));
+                } else {
+                    alert('Web Share API is not supported in your browser.');
+                }
+            }
+        </script>
+
         <section class="qr-code-section text-center mt-12">
             <h2 class="text-2xl font-serif text-ivory-white mb-4">Share the Gallery</h2>
             <div class="flex justify-center">
                 <img src="/qr" alt="QR Code for Gallery" class="bg-white p-4 rounded-lg">
             </div>
+        </section>
+
+        <section class="clear-section text-center mt-12">
+            <form action="/clear" method="post" class="bg-deep-black p-8 rounded-lg shadow-lg">
+                <div class="mb-4">
+                    <label for="password" class="block text-ivory-white mb-2">Admin Password</label>
+                    <input type="password" id="password" name="password" class="input input-bordered w-full bg-ivory-white text-deep-black" required>
+                </div>
+                <button type="submit" class="btn btn-error text-ivory-white">Clear All Photos</button>
+            </form>
         </section>
     </div>
 </body>
