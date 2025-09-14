@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="lightoflove">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In the Light of Love</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.6/dist/full.css" rel="stylesheet" type="text/css" />
+    <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'velvet-red': '#7A1C1C',
+            'bright-red': '#C41E3A',
+            'candlelight-yellow': '#FFD67A',
+            'deep-black': '#0D0D0D',
+            'ivory-white': '#F5F5F5',
+          },
+          fontFamily: {
+            'serif': ['"Playfair Display"', 'serif'],
+            'sans': ['"Inter"', 'sans-serif'],
+          },
+        },
+      },
+      plugins: [require("daisyui")],
+      daisyui: {
+        themes: [
+          {
+            lightoflove: {
+              "primary": "#7A1C1C",
+              "secondary": "#C41E3A",
+              "accent": "#FFD67A",
+              "neutral": "#0D0D0D",
+              "base-100": "#F5F5F5",
+              "info": "#3ABFF8",
+              "success": "#36D399",
+              "warning": "#FBBD23",
+              "error": "#F87272",
+            },
+          },
+        ],
+      },
+    }
+  </script>
+</head>
+<body class="bg-velvet-red text-ivory-white font-sans">
+    <div class="container mx-auto p-8">
+        <header class="text-center mb-12">
+            <h1 class="text-5xl font-serif text-ivory-white">In the Light of Love</h1>
+        </header>
+
+        <section class="upload-section mb-12">
+            <form action="/upload" method="post" enctype="multipart/form-data" class="bg-deep-black p-8 rounded-lg shadow-lg">
+                <div class="mb-4">
+                    <label for="name" class="block text-ivory-white mb-2">Your Name</label>
+                    <input type="text" id="name" name="name" class="input input-bordered w-full bg-ivory-white text-deep-black" required>
+                </div>
+                <div class="mb-4">
+                    <label for="photos" class="block text-ivory-white mb-2">Upload Photos</label>
+                    <input type="file" id="photos" name="photos" class="file-input file-input-bordered w-full bg-ivory-white text-deep-black" multiple accept="image/*" required>
+                </div>
+                <button type="submit" class="btn bg-bright-red text-ivory-white hover:bg-candlelight-yellow hover:text-deep-black w-full">Submit</button>
+            </form>
+        </section>
+
+        <section class="gallery-section">
+            {{range $uploader, $photos := .Gallery}}
+            <div class="mb-8">
+                <h2 class="text-2xl font-serif bg-velvet-red text-ivory-white p-4 rounded-t-lg">{{$uploader}}</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-deep-black rounded-b-lg">
+                    {{range $photos}}
+                    <div class="gallery-item">
+                        <img src="/uploads/{{.}}" alt="Photo by {{$uploader}}" class="w-full h-auto object-cover">
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+            {{end}}
+        </section>
+
+        <section class="qr-code-section text-center mt-12">
+            <h2 class="text-2xl font-serif text-ivory-white mb-4">Share the Gallery</h2>
+            <div class="flex justify-center">
+                <img src="/qr" alt="QR Code for Gallery" class="bg-white p-4 rounded-lg">
+            </div>
+        </section>
+    </div>
+</body>
+</html>
