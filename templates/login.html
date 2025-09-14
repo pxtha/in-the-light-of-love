@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="lightoflove">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In the Light of Love - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.6/dist/full.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'velvet-red': '#7A1C1C',
+            'bright-red': '#C41E3A',
+            'candlelight-yellow': '#FFD67A',
+            'deep-black': '#0D0D0D',
+            'ivory-white': '#F5F5F5',
+          },
+          fontFamily: {
+            'serif': ['"Playfair Display"', 'serif'],
+            'sans': ['"Inter"', 'sans-serif'],
+          },
+        },
+      },
+      plugins: [require("daisyui")],
+      daisyui: {
+        themes: [
+          {
+            lightoflove: {
+              "primary": "#7A1C1C",
+              "secondary": "#C41E3A",
+              "accent": "#FFD67A",
+              "neutral": "#0D0D0D",
+              "base-100": "#F5F5F5",
+              "info": "#3ABFF8",
+              "success": "#36D399",
+              "warning": "#FBBD23",
+              "error": "#F87272",
+            },
+          },
+        ],
+      },
+    }
+  </script>
+</head>
+<body class="bg-velvet-red text-ivory-white font-sans flex items-center justify-center min-h-screen">
+    <div class="container mx-auto p-8 text-center">
+        <header class="mb-12">
+            <h1 class="text-5xl font-serif text-ivory-white">In the Light of Love</h1>
+            <p class="text-lg text-ivory-white mt-4">Welcome to our wedding gallery. Please enter your name to share and view photos from our special day.</p>
+        </header>
+
+        <section class="login-section">
+            <form action="/login" method="post" class="bg-deep-black p-8 rounded-lg shadow-lg max-w-sm mx-auto">
+                <div class="mb-4">
+                    <label for="name" class="block text-ivory-white mb-2">Guess Name</label>
+                    <input type="text" id="name" name="name" class="input input-bordered w-full bg-ivory-white text-deep-black" required>
+                </div>
+                <button type="submit" class="btn bg-bright-red text-ivory-white hover:bg-candlelight-yellow hover:text-deep-black w-full">Enter</button>
+            </form>
+        </section>
+    </div>
+</body>
+</html>

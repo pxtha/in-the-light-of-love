@@ -21,9 +21,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Name:    "username",
 		Value:   name,
 		Expires: time.Now().Add(24 * time.Hour),
+		Path:    "/",
 	}
 	http.SetCookie(w, &cookie)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/gallery", http.StatusSeeOther)
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {

@@ -13,8 +13,25 @@ type PageData struct {
 	Gallery  map[string][]Photo
 }
 
+func LoginPageHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("templates/login.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	tmpl.Execute(w, nil)
+}
+
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("templates/index.html")
+	username := ""
+	cookie, err := r.Cookie("username")
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	username = cookie.Value
+
+	tmpl, err := template.ParseFiles("templates/gallery.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -47,12 +64,6 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}
-
-	username := ""
-	cookie, err := r.Cookie("username")
-	if err == nil {
-		username = cookie.Value
 	}
 
 	data := PageData{

@@ -1,3 +1,30 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+}
+
+.btn {
+    border-radius: 0.5rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card {
+    border: 1px solid #FFD67A;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    border-color: #C41E3A;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}

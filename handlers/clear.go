@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func ClearHandler(w http.ResponseWriter, r *http.Request) {
@@ -12,11 +13,12 @@ func ClearHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	password := r.FormValue("password")
-	if password != "admm@123" {
+	cookie, err := r.Cookie("username")
+	if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
+	name := cookie.Value
 
 	uploadDir := "uploads"
 	dir, err := os.ReadDir(uploadDir)
@@ -26,8 +28,10 @@ func ClearHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, d := range dir {
-		os.RemoveAll(filepath.Join(uploadDir, d.Name()))
+		if strings.HasPrefix(d.Name(), name+"_") {
+			os.RemoveAll(filepath.Join(uploadDir, d.Name()))
+		}
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/gallery", http.StatusSeeOther)
 }

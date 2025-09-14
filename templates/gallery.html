@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.6/dist/full.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/static/style.css">
     <script>
     tailwind.config = {
       theme: {
@@ -51,7 +52,6 @@
             <h1 class="text-5xl font-serif text-ivory-white">In the Light of Love</h1>
         </header>
 
-        {{if .Username}}
         <div class="text-center mb-8">
             <p class="text-xl text-ivory-white">Welcome, {{.Username}}!</p>
             <a href="/logout" class="text-bright-red hover:text-candlelight-yellow">Logout</a>
@@ -60,23 +60,12 @@
         <section class="upload-section mb-12">
             <form action="/upload" method="post" enctype="multipart/form-data" class="bg-deep-black p-8 rounded-lg shadow-lg">
                 <div class="mb-4">
-                    <label for="photos" class="block text-ivory-white mb-2">Upload Photos</label>
+                    <label for="photos" class="block text-ivory-white mb-2">Share your favorite moments from our wedding</label>
                     <input type="file" id="photos" name="photos" class="file-input file-input-bordered w-full bg-ivory-white text-deep-black" multiple accept="image/*" required>
                 </div>
-                <button type="submit" class="btn bg-bright-red text-ivory-white hover:bg-candlelight-yellow hover:text-deep-black w-full">Submit</button>
+                <button type="submit" class="btn bg-bright-red text-ivory-white hover:bg-candlelight-yellow hover:text-deep-black w-full">Upload Photos</button>
             </form>
         </section>
-        {{else}}
-        <section class="login-section mb-12">
-            <form action="/login" method="post" class="bg-deep-black p-8 rounded-lg shadow-lg">
-                <div class="mb-4">
-                    <label for="name" class="block text-ivory-white mb-2">Enter Your Name to Continue</label>
-                    <input type="text" id="name" name="name" class="input input-bordered w-full bg-ivory-white text-deep-black" required>
-                </div>
-                <button type="submit" class="btn bg-bright-red text-ivory-white hover:bg-candlelight-yellow hover:text-deep-black w-full">Enter</button>
-            </form>
-        </section>
-        {{end}}
 
         <section class="gallery-section">
             {{range $uploader, $photos := .Gallery}}
@@ -139,12 +128,8 @@
         </section>
 
         <section class="clear-section text-center mt-12">
-            <form action="/clear" method="post" class="bg-deep-black p-8 rounded-lg shadow-lg">
-                <div class="mb-4">
-                    <label for="password" class="block text-ivory-white mb-2">Admin Password</label>
-                    <input type="password" id="password" name="password" class="input input-bordered w-full bg-ivory-white text-deep-black" required>
-                </div>
-                <button type="submit" class="btn btn-error text-ivory-white">Clear All Photos</button>
+            <form action="/clear" method="post">
+                <button type="submit" class="btn btn-xs btn-outline btn-error">Clear My Photos</button>
             </form>
         </section>
     </div>

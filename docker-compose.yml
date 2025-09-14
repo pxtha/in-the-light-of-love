@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   web:
-    image: registry.digitalocean.com/praslar/in-the-light-of-love:latest
+    build: .
     ports:
       - "8080:8080"
     volumes:
