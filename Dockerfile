@@ -17,9 +17,9 @@ FROM alpine:latest
 
 WORKDIR /app
 COPY --from=go-builder /in-the-light-of-love .
-COPY --from=go-builder /app/static ./static
-COPY --from=go-builder /app/templates ./templates
-COPY --from=go-builder /app/uploads ./uploads
+COPY static ./static
+COPY templates ./templates
+RUN mkdir -p /app/uploads
 
 EXPOSE 8080
 CMD ["/app/in-the-light-of-love"]

@@ -1,10 +1,14 @@
 package handlers
 
-import "sync"
+import (
+	"sync"
+	"time"
+)
 
 type Photo struct {
 	Filename string
 	Likes    int
+	ModTime  time.Time
 }
 
 var (

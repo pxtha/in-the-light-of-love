@@ -5,12 +5,16 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
 type PageData struct {
-	Username string
-	Gallery  map[string][]Photo
+	Username    string
+	Gallery     map[string][]Photo
+	TotalGuests int
+	TotalPhotos int
+	TotalLikes  int
 }
 
 func LoginPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -54,6 +58,7 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 				photo := Photo{
 					Filename: info.Name(),
 					Likes:    likes,
+					ModTime:  info.ModTime(),
 				}
 				gallery[uploaderName] = append(gallery[uploaderName], photo)
 			}
@@ -66,9 +71,31 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	for _, photos := range gallery {
+		sort.Slice(photos, func(i, j int) bool {
+			if photos[i].Likes != photos[j].Likes {
+				return photos[i].Likes > photos[j].Likes
+			}
+			return photos[i].ModTime.After(photos[j].ModTime)
+		})
+	}
+
+	totalGuests := len(gallery)
+	totalPhotos := 0
+	totalLikes := 0
+	for _, photos := range gallery {
+		totalPhotos += len(photos)
+		for _, photo := range photos {
+			totalLikes += photo.Likes
+		}
+	}
+
 	data := PageData{
-		Username: username,
-		Gallery:  gallery,
+		Username:    username,
+		Gallery:     gallery,
+		TotalGuests: totalGuests,
+		TotalPhotos: totalPhotos,
+		TotalLikes:  totalLikes,
 	}
 
 	tmpl.Execute(w, data)
