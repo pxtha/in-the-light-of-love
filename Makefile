@@ -20,8 +20,8 @@ push:
 
 # Run the application using Docker Compose
 run:
-	docker-compose up --build --force-recreate -d
+	docker compose up --build --force-recreate -d
 
 # Stop and remove the application containers
 down:
-	docker-compose down
+	docker compose down
