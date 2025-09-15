@@ -3,8 +3,8 @@
 # Variables - These can be overridden by environment variables
 REGISTRY ?= registry.digitalocean.com/praslar
 IMAGE_NAME ?= in-the-light-of-love
-TAG ?= latest
-IMAGE_TAG = $(REGISTRY)/$(IMAGE_NAME):$(TAG)
+VERSION = $(shell cat VERSION)
+IMAGE_TAG = $(REGISTRY)/$(IMAGE_NAME):$(VERSION)
 
 .PHONY: all build push run down
 
@@ -20,7 +20,7 @@ push:
 
 # Run the application using Docker Compose
 run:
-	docker compose up --build --force-recreate -d
+	VERSION=$(VERSION) docker compose up -d
 
 # Stop and remove the application containers
 down:
