@@ -28,20 +28,17 @@
     <main class="content-bg min-h-screen p-8 md:p-12">
         
         <header class="text-center mb-12">
+            <img src="/static/2-cats.2.jpg" alt="Cat Logo" class="w-24 h-24 mx-auto mb-4 rounded-full">
             <h1 class="font-serif text-5xl md:text-6xl uppercase tracking-[0.2em] text-rich-burgundy">Gallery</h1>
             <p class="mt-4 text-gray-600">Welcome, {{.Username}}! | <a href="/logout" class="text-rich-burgundy hover:text-rich-burgundy/80 underline">Logout</a></p>
-            <nav class="mt-4">
-                <a href="/gallery" class="text-rich-burgundy hover:text-rich-burgundy/80 underline p-2">Gallery</a>
-                <a href="/prewedding" class="text-rich-burgundy hover:text-rich-burgundy/80 underline p-2">Pre-wedding</a>
-            </nav>
         </header>
 
-        <section class="awards-section mb-12">
+        <section class="awards-section mb-12 py-8 border-b border-rich-burgundy/10">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="best-photo text-center">
                     <h2 class="font-serif text-3xl md:text-4xl uppercase tracking-[0.2em] text-rich-burgundy mb-4">Best Photo of the Day</h2>
                     {{if .BestPhoto.Filename}}
-                    <img src="/uploads/{{.BestPhoto.Filename}}" alt="Best photo of the day" class="w-full h-auto object-cover">
+                    <img src="/uploads/{{.BestPhoto.Filename}}" alt="Best photo of the day" class="w-full h-auto object-cover rounded-lg shadow-md">
                     <p class="mt-2 text-gray-600">❤ {{.BestPhoto.Likes}}</p>
                     {{else}}
                     <p class="text-gray-600">No photos uploaded today.</p>
@@ -60,8 +57,8 @@
             </div>
         </section>
 
-        <section class="stats-section text-center mb-12">
-            <div class="flex justify-center space-x-8">
+        <section class="stats-section text-center mb-12 py-8 border-b border-rich-burgundy/10">
+            <div class="flex justify-around">
                 <div class="stat">
                     <div class="text-gray-600 uppercase tracking-widest">Guests</div>
                     <div class="text-rich-burgundy text-4xl font-bold">{{.TotalGuests}}</div>
@@ -77,23 +74,23 @@
             </div>
         </section>
 
-        <section class="upload-section mb-12 max-w-xl mx-auto">
-            <form action="/upload" method="post" enctype="multipart/form-data" class="border border-rich-burgundy/20 p-8">
+        <section class="upload-section mb-12 max-w-xl mx-auto py-8 border-b border-rich-burgundy/10">
+            <form action="/upload" method="post" enctype="multipart/form-data" class="text-center">
                 <div class="mb-4">
                     <label for="photos" class="block text-gray-600 mb-2 text-center">Share your favorite moments</label>
-                    <input type="file" id="photos" name="photos" class="w-full bg-ivory-cream border-b border-rich-burgundy/50 text-rich-burgundy p-2" multiple accept="image/*" required>
+                    <input type="file" id="photos" name="photos" class="w-full bg-ivory-cream border border-rich-burgundy/20 text-rich-burgundy p-2 rounded-md" multiple accept="image/*" required>
                 </div>
-                <button type="submit" class="w-full bg-rich-burgundy text-ivory-cream hover:bg-rich-burgundy/90 font-bold py-2 px-4">Upload Photos</button>
+                <button type="submit" class="w-full bg-rich-burgundy text-ivory-cream hover:bg-rich-burgundy/90 font-bold py-2 px-4 rounded-lg">Upload Photos</button>
             </form>
         </section>
 
         <section class="gallery-section">
             {{range $uploader, $photos := .Gallery}}
-            <div class="mb-12">
+            <div class="mb-12 py-8">
                 <h2 class="font-serif text-3xl md:text-4xl uppercase tracking-[0.2em] text-rich-burgundy text-center mb-8">{{$uploader}}'s Photos</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {{range .}}
-                    <div class="gallery-item relative group">
+                    <div class="gallery-item relative group rounded-lg overflow-hidden shadow-md">
                         <img src="/uploads/{{.Filename}}" alt="Photo by {{$uploader}}" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
                             <button onclick="likeImage(this, '{{.Filename}}')" class="text-ivory-cream text-3xl">❤ <span class="like-count">{{.Likes}}</span></button>
