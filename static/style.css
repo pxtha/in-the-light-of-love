@@ -1,6 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Montserrat:wght@400;700&display=swap');
+
 body {
+    background-color: #6A0E29; /* Deep Red Background */
     font-family: 'Montserrat', sans-serif;
-    background-color: #6A0E29;
+    color: #333333; /* Dark text for readability on cream */
+}
+
+.content-bg {
+    background-color: #FFFCEF; /* Ivory Cream */
 }
 
 .background-container {
@@ -16,38 +23,27 @@ body {
     z-index: -1;
 }
 
+.login-background-container {
+    background-image: url('/static/2-cats.2.jpg');
+    background-size: cover;
+    background-position: center;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
 .blurred {
     filter: blur(8px);
     -webkit-filter: blur(8px);
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
-}
-
-.btn {
-    border-radius: 0.5rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 0.05em;
-    transition: all 0.3s ease;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.card {
-    border: 1px solid #FFD67A;
-    transition: all 0.3s ease;
-}
-
-.card:hover {
-    border-color: #C41E3A;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: 'Cormorant Garamond', serif;
 }
 
 .swiper-button-next, .swiper-button-prev {
-    color: #FFD67A !important;
+    color: #6A0E29 !important;
 }

@@ -4,15 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thang & Quynh | In the Light of Love</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <link rel="stylesheet" href="/static/style.css">
-    <style>
-        .is-moving {
-            transition: opacity 0.5s ease-out;
-        }
-    </style>
     <script>
     tailwind.config = {
       theme: {
@@ -22,7 +15,7 @@
             'ivory-cream': '#FFFCEF',
           },
           fontFamily: {
-            'serif': ['"Playfair Display"', 'serif'],
+            'serif': ['"Cormorant Garamond"', 'serif'],
             'sans': ['"Montserrat"', 'sans-serif'],
           },
         },
@@ -30,157 +23,88 @@
     }
   </script>
 </head>
-<body class="text-ivory-cream font-sans">
+<body class="bg-rich-burgundy">
 
-    <div class="background-container blurred"></div>
-
-    <main class="relative z-10 container mx-auto p-8">
+    <main class="content-bg min-h-screen p-8 md:p-12">
+        
         <header class="text-center mb-12">
-            <h1 class="text-5xl font-serif text-ivory-cream">In the Light of Love</h1>
-            <p class="text-lg text-ivory-cream/80 mt-2">Welcome, {{.Username}}! | <a href="/logout" class="text-ivory-cream hover:text-ivory-cream/80 underline">Logout</a></p>
+            <h1 class="font-serif text-5xl md:text-6xl uppercase tracking-[0.2em] text-rich-burgundy">Gallery</h1>
+            <p class="mt-4 text-gray-600">Welcome, {{.Username}}! | <a href="/logout" class="text-rich-burgundy hover:text-rich-burgundy/80 underline">Logout</a></p>
         </header>
 
         <section class="stats-section text-center mb-12">
-            <div class="flex justify-center space-x-8 bg-rich-burgundy/50 p-4 rounded-lg shadow-lg backdrop-blur-sm">
+            <div class="flex justify-center space-x-8">
                 <div class="stat">
-                    <div class="text-ivory-cream uppercase tracking-widest">Guests</div>
-                    <div id="stats-guests" class="text-ivory-cream text-4xl font-bold" data-value="{{.TotalGuests}}">0</div>
+                    <div class="text-gray-600 uppercase tracking-widest">Guests</div>
+                    <div class="text-rich-burgundy text-4xl font-bold">{{.TotalGuests}}</div>
                 </div>
                 <div class="stat">
-                    <div class="text-ivory-cream uppercase tracking-widest">Photos</div>
-                    <div id="stats-photos" class="text-ivory-cream text-4xl font-bold" data-value="{{.TotalPhotos}}">0</div>
+                    <div class="text-gray-600 uppercase tracking-widest">Photos</div>
+                    <div class="text-rich-burgundy text-4xl font-bold">{{.TotalPhotos}}</div>
                 </div>
                 <div class="stat">
-                    <div class="text-ivory-cream uppercase tracking-widest">Likes</div>
-                    <div id="stats-likes" class="text-ivory-cream text-4xl font-bold" data-value="{{.TotalLikes}}">0</div>
+                    <div class="text-gray-600 uppercase tracking-widest">Likes</div>
+                    <div class="text-rich-burgundy text-4xl font-bold">{{.TotalLikes}}</div>
                 </div>
             </div>
         </section>
 
-        <section class="upload-section mb-12">
-            <form action="/upload" method="post" enctype="multipart/form-data" class="bg-rich-burgundy/50 p-8 rounded-lg shadow-lg backdrop-blur-sm">
+        <section class="upload-section mb-12 max-w-xl mx-auto">
+            <form action="/upload" method="post" enctype="multipart/form-data" class="border border-rich-burgundy/20 p-8">
                 <div class="mb-4">
-                    <label for="photos" class="block text-ivory-cream mb-2">Share your favorite moments from our wedding</label>
-                    <input type="file" id="photos" name="photos" class="w-full bg-ivory-cream/10 text-ivory-cream rounded-lg p-2 border border-ivory-cream/20" multiple accept="image/*" required>
+                    <label for="photos" class="block text-gray-600 mb-2 text-center">Share your favorite moments</label>
+                    <input type="file" id="photos" name="photos" class="w-full bg-ivory-cream border-b border-rich-burgundy/50 text-rich-burgundy p-2" multiple accept="image/*" required>
                 </div>
-                <button type="submit" class="w-full bg-ivory-cream text-rich-burgundy hover:bg-ivory-cream/80 font-bold py-2 px-4 rounded-lg">Upload Photos</button>
+                <button type="submit" class="w-full bg-rich-burgundy text-ivory-cream hover:bg-rich-burgundy/90 font-bold py-2 px-4">Upload Photos</button>
             </form>
         </section>
 
         <section class="gallery-section">
             {{range $uploader, $photos := .Gallery}}
-            <div class="mb-8">
-                <h2 class="text-2xl font-serif text-ivory-cream p-4">{{$uploader}}'s Photos</h2>
-                <div class="swiper-container" id="swiper-{{$uploader}}">
-                    <div class="swiper-wrapper">
-                        {{range .}}
-                        <div class="swiper-slide" data-filename="{{.Filename}}">
-                            <div class="gallery-item bg-rich-burgundy/50 rounded-lg shadow-lg overflow-hidden backdrop-blur-sm">
-                                <figure><img src="/uploads/{{.Filename}}" alt="Photo by {{$uploader}}" class="w-full h-64 object-cover"></figure>
-                                <div class="p-4">
-                                    <div class="flex justify-between items-center">
-                                        <button onclick="likeImage(this, '{{.Filename}}', '{{$uploader}}')" class="border border-ivory-cream text-ivory-cream hover:bg-ivory-cream hover:text-rich-burgundy font-bold py-1 px-2 rounded-lg text-sm">❤ <span class="like-count">{{.Likes}}</span></button>
-                                        <a href="/uploads/{{.Filename}}" download class="border border-ivory-cream text-ivory-cream hover:bg-ivory-cream hover:text-rich-burgundy font-bold py-1 px-2 rounded-lg text-sm">Download</a>
-                                        <button onclick="shareImage('{{.Filename}}')" class="border border-ivory-cream text-ivory-cream hover:bg-ivory-cream hover:text-rich-burgundy font-bold py-1 px-2 rounded-lg text-sm">Share</button>
-                                    </div>
-                                </div>
+            <div class="mb-12">
+                <h2 class="font-serif text-3xl md:text-4xl uppercase tracking-[0.2em] text-rich-burgundy text-center mb-8">{{$uploader}}'s Photos</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
+                    {{range .}}
+                    <div class="gallery-item relative group">
+                        <img src="/uploads/{{.Filename}}" alt="Photo by {{$uploader}}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+                            <button onclick="likeImage(this, '{{.Filename}}')" class="text-ivory-cream text-3xl">❤ <span class="like-count">{{.Likes}}</span></button>
+                            
+                            <div class="absolute bottom-4 right-4 flex space-x-2">
+                                <a href="/uploads/{{.Filename}}" download class="text-ivory-cream hover:text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                </a>
+                                <button onclick="shareImage('{{.Filename}}')" class="text-ivory-cream hover:text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6.002l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.368a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
-                        {{end}}
                     </div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
+                    {{end}}
                 </div>
             </div>
             {{end}}
         </section>
 
-        <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                function animateValue(obj, start, end, duration) {
-                    if (end === 0) {
-                        obj.innerHTML = 0;
-                        return;
-                    }
-                    let startTimestamp = null;
-                    const step = (timestamp) => {
-                        if (!startTimestamp) startTimestamp = timestamp;
-                        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                        obj.innerHTML = Math.floor(progress * (end - start) + start);
-                        if (progress < 1) {
-                            window.requestAnimationFrame(step);
-                        }
-                    };
-                    window.requestAnimationFrame(step);
-                }
+            window.likeImage = function(button, filename) {
+                const formData = new FormData();
+                formData.append('filename', filename);
 
-                const guestsStat = document.getElementById('stats-guests');
-                const photosStat = document.getElementById('stats-photos');
-                const likesStat = document.getElementById('stats-likes');
-
-                animateValue(guestsStat, 0, parseInt(guestsStat.dataset.value), 1500);
-                animateValue(photosStat, 0, parseInt(photosStat.dataset.value), 1500);
-                animateValue(likesStat, 0, parseInt(likesStat.dataset.value), 1500);
-
-                const swipers = {};
-                {{range $uploader, $photos := .Gallery}}
-                swipers['{{$uploader}}'] = new Swiper('#swiper-{{$uploader}}', {
-                    slidesPerView: 1,
-                    spaceBetween: 10,
-                    navigation: {
-                        nextEl: '#swiper-{{$uploader}} .swiper-button-next',
-                        prevEl: '#swiper-{{$uploader}} .swiper-button-prev',
-                    },
-                    breakpoints: {
-                        640: { slidesPerView: 2, spaceBetween: 20 },
-                        768: { slidesPerView: 3, spaceBetween: 40 },
-                        1024: { slidesPerView: 4, spaceBetween: 50 },
-                    }
-                });
-                {{end}}
-
-                window.likeImage = function(button, filename, uploader) {
-                    const formData = new FormData();
-                    formData.append('filename', filename);
-
-                    fetch('/like', {
-                        method: 'POST',
-                        body: formData,
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        const likeCountSpan = button.querySelector('.like-count');
-                        likeCountSpan.textContent = data.likes;
-
-                        const swiper = swipers[uploader];
-                        const slide = button.closest('.swiper-slide');
-                        const slideIndex = Array.from(swiper.slides).indexOf(slide);
-
-                        let isNewTop = true;
-                        for (let i = 0; i < slideIndex; i++) {
-                            const otherSlide = swiper.slides[i];
-                            const otherLikes = parseInt(otherSlide.querySelector('.like-count').textContent);
-                            if (otherLikes >= data.likes) {
-                                isNewTop = false;
-                                break;
-                            }
-                        }
-
-                        if (isNewTop && slideIndex > 0) {
-                            slide.classList.add('is-moving');
-                            slide.style.opacity = '0';
-                            setTimeout(() => {
-                                swiper.wrapperEl.insertBefore(slide, swiper.slides[0]);
-                                swiper.update();
-                                slide.style.opacity = '1';
-                                slide.classList.remove('is-moving');
-                            }, 500);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-                }
-            });
+                fetch('/like', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    button.querySelector('.like-count').textContent = data.likes;
+                })
+                .catch(error => console.error('Error:', error));
+            }
 
             function shareImage(filename) {
                 if (navigator.share) {
@@ -197,18 +121,16 @@
             }
         </script>
 
-        <section class="qr-code-section text-center mt-12">
-            <h2 class="text-2xl font-serif text-ivory-cream mb-4">Share the Gallery</h2>
-            <div class="flex justify-center">
-                <img src="/qr" alt="QR Code for Gallery" class="bg-white p-4 rounded-lg">
+        <footer class="text-center mt-12">
+            <div class="flex justify-center mb-4">
+                <img src="/qr" alt="QR Code for Gallery" class="bg-white p-2">
             </div>
-        </section>
-
-        <section class="clear-section text-center mt-12">
+            <h2 class="font-serif text-2xl uppercase tracking-[0.2em] text-rich-burgundy mb-4">Share the Gallery</h2>
             <form action="/clear" method="post">
-                <button type="submit" class="text-sm text-ivory-cream hover:text-ivory-cream/80 underline">Clear My Photos</button>
+                <button type="submit" class="text-sm text-rich-burgundy hover:text-rich-burgundy/80 underline">Clear My Photos</button>
             </form>
-        </section>
+        </footer>
+
     </main>
 
 </body>

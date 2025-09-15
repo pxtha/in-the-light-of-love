@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thang & Quynh | In the Light of Love</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/style.css">
     <script>
@@ -16,7 +15,7 @@
             'ivory-cream': '#FFFCEF',
           },
           fontFamily: {
-            'serif': ['"Playfair Display"', 'serif'],
+            'serif': ['"Cormorant Garamond"', 'serif'],
             'sans': ['"Montserrat"', 'sans-serif'],
           },
         },
@@ -26,26 +25,23 @@
 </head>
 <body class="text-ivory-cream font-sans">
 
-    <div class="background-container"></div>
+    <div class="login-background-container"></div>
+    <div class="absolute inset-0 bg-black/30"></div>
 
-    <main class="relative z-10 flex items-center justify-center min-h-screen">
+    <main class="relative z-10 min-h-screen flex flex-col items-center justify-center p-8 text-center">
         
-        <section class="relative w-full max-w-md p-8 text-center">
-            
-            <p class="mb-4 text-lg text-ivory-cream/80">Welcome to our wedding celebration</p>
-            
-            <h1 class="text-6xl text-ivory-cream font-serif md:text-8xl">Thang & Quynh</h1>
+        <h1 class="font-serif text-6xl md:text-8xl text-ivory-cream">Thang & Quynh</h1>
+        <p class="mt-4 text-lg text-ivory-cream/80">Welcome to our wedding gallery</p>
 
-            <div class="mt-10">
-                <form action="/login" method="post" class="bg-rich-burgundy/50 p-8 rounded-lg shadow-lg backdrop-blur-sm">
-                    <div class="mb-4">
-                        <label for="name" class="block text-ivory-cream mb-2">Please enter your name to continue</label>
-                        <input type="text" id="name" name="name" class="w-full bg-ivory-cream/10 text-ivory-cream rounded-lg p-2 border border-ivory-cream/20" required>
-                    </div>
-                    <button type="submit" class="w-full bg-ivory-cream text-rich-burgundy hover:bg-ivory-cream/80 font-bold py-2 px-4 rounded-lg">Enter Gallery</button>
-                </form>
-            </div>
-        </section>
+        <div class="mt-8 w-full max-w-sm">
+            <form action="/login" method="post" class="bg-black/20 p-8 rounded-lg shadow-lg backdrop-blur-sm">
+                <div class="mb-4">
+                    <label for="name" class="sr-only">Your Name</label>
+                    <input type="text" id="name" name="name" class="w-full bg-transparent border-b border-ivory-cream/50 text-ivory-cream text-center p-2" placeholder="Please enter your name to continue" required>
+                </div>
+                <button type="submit" class="w-full bg-ivory-cream text-rich-burgundy hover:bg-ivory-cream/90 font-bold py-2 px-4 rounded-lg">Enter</button>
+            </form>
+        </div>
 
     </main>
 
