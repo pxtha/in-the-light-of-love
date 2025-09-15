@@ -30,6 +30,10 @@
         <header class="text-center mb-12">
             <h1 class="font-serif text-5xl md:text-6xl uppercase tracking-[0.2em] text-rich-burgundy">Gallery</h1>
             <p class="mt-4 text-gray-600">Welcome, {{.Username}}! | <a href="/logout" class="text-rich-burgundy hover:text-rich-burgundy/80 underline">Logout</a></p>
+            <nav class="mt-4">
+                <a href="/gallery" class="text-rich-burgundy hover:text-rich-burgundy/80 underline p-2">Gallery</a>
+                <a href="/prewedding" class="text-rich-burgundy hover:text-rich-burgundy/80 underline p-2">Pre-wedding</a>
+            </nav>
         </header>
 
         <section class="awards-section mb-12">
@@ -147,12 +151,13 @@
 
         <footer class="text-center mt-12">
             <div class="flex justify-center mb-4">
-                <img src="/qr" alt="QR Code for Gallery" class="bg-white p-2">
+                <img src="/qr" alt="QR Code for Gallery" class="bg-white p-2 w-48 h-48">
             </div>
             <h2 class="font-serif text-2xl uppercase tracking-[0.2em] text-rich-burgundy mb-4">Share the Gallery</h2>
-            <form action="/clear" method="post">
+            <form action="/clear" method="post" class="mb-4">
                 <button type="submit" class="text-sm text-rich-burgundy hover:text-rich-burgundy/80 underline">Clear My Photos</button>
             </form>
+            <p class="text-sm text-gray-600">Website created by Thang Pham, with help of AI</p>
         </footer>
 
     </main>

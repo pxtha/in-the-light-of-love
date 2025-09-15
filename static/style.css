@@ -47,3 +47,27 @@ h1, h2, h3, h4, h5, h6, .font-serif {
 .swiper-button-next, .swiper-button-prev {
     color: #6A0E29 !important;
 }
+
+/* Animation for login page */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 1s ease-out forwards;
+}
+
+.animation-delay-300 {
+    animation-delay: 300ms;
+}
+
+.animation-delay-600 {
+    animation-delay: 600ms;
+}
