@@ -32,6 +32,30 @@
             <p class="mt-4 text-gray-600">Welcome, {{.Username}}! | <a href="/logout" class="text-rich-burgundy hover:text-rich-burgundy/80 underline">Logout</a></p>
         </header>
 
+        <section class="awards-section mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="best-photo text-center">
+                    <h2 class="font-serif text-3xl md:text-4xl uppercase tracking-[0.2em] text-rich-burgundy mb-4">Best Photo of the Day</h2>
+                    {{if .BestPhoto.Filename}}
+                    <img src="/uploads/{{.BestPhoto.Filename}}" alt="Best photo of the day" class="w-full h-auto object-cover">
+                    <p class="mt-2 text-gray-600">❤ {{.BestPhoto.Likes}}</p>
+                    {{else}}
+                    <p class="text-gray-600">No photos uploaded today.</p>
+                    {{end}}
+                </div>
+                <div class="top-guests text-center">
+                    <h2 class="font-serif text-3xl md:text-4xl uppercase tracking-[0.2em] text-rich-burgundy mb-4">Top 2 Guests Today</h2>
+                    <ul class="space-y-4">
+                        {{range .TopGuests}}
+                        <li class="text-2xl text-gray-600">{{.Name}} - ❤ {{.Likes}}</li>
+                        {{else}}
+                        <li class="text-gray-600">No guests have uploaded photos today.</li>
+                        {{end}}
+                    </ul>
+                </div>
+            </div>
+        </section>
+
         <section class="stats-section text-center mb-12">
             <div class="flex justify-center space-x-8">
                 <div class="stat">

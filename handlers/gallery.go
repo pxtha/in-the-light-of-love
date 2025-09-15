@@ -7,7 +7,13 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
+
+type GuestStats struct {
+	Name  string
+	Likes int
+}
 
 type PageData struct {
 	Username    string
@@ -15,6 +21,8 @@ type PageData struct {
 	TotalGuests int
 	TotalPhotos int
 	TotalLikes  int
+	BestPhoto   Photo
+	TopGuests   []GuestStats
 }
 
 func LoginPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -90,12 +98,41 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Find best photo and top guests of the day
+	var bestPhoto Photo
+	guestLikesToday := make(map[string]int)
+	today := time.Now().Truncate(24 * time.Hour)
+
+	for uploader, photos := range gallery {
+		for _, photo := range photos {
+			if photo.ModTime.After(today) {
+				if photo.Likes > bestPhoto.Likes {
+					bestPhoto = photo
+				}
+				guestLikesToday[uploader] += photo.Likes
+			}
+		}
+	}
+
+	var topGuests []GuestStats
+	for name, likes := range guestLikesToday {
+		topGuests = append(topGuests, GuestStats{Name: name, Likes: likes})
+	}
+	sort.Slice(topGuests, func(i, j int) bool {
+		return topGuests[i].Likes > topGuests[j].Likes
+	})
+	if len(topGuests) > 2 {
+		topGuests = topGuests[:2]
+	}
+
 	data := PageData{
 		Username:    username,
 		Gallery:     gallery,
 		TotalGuests: totalGuests,
 		TotalPhotos: totalPhotos,
 		TotalLikes:  totalLikes,
+		BestPhoto:   bestPhoto,
+		TopGuests:   topGuests,
 	}
 
 	tmpl.Execute(w, data)
