@@ -29,13 +29,13 @@
 
     <main class="content-bg min-h-screen p-8 md:p-12">
         
-        <header class="text-center mb-12">
+        <header class="text-center mb-4">
             <img src="/static/2-cats.2.jpg" alt="Cat Logo" class="w-24 h-24 mx-auto mb-4 rounded-full">
             <h1 class="font-serif text-5xl md:text-6xl uppercase tracking-[0.2em] text-rich-burgundy">Gallery</h1>
             <p class="mt-4 text-gray-600 font-vietnamese">Welcome, {{.Username}}! | <a href="/logout" class="text-rich-burgundy hover:text-rich-burgundy/80 underline">Logout</a></p>
         </header>
 
-        <section class="upload-section mb-12 max-w-xl mx-auto py-8 border-b border-rich-burgundy/10">
+        <section class="upload-section mb-8 max-w-xl mx-auto py-8 border-b border-rich-burgundy/10">
             <form action="/upload" method="post" enctype="multipart/form-data" class="text-center">
                 <div class="mb-4">
                     <label for="photos" class="block text-gray-600 mb-2 text-center">Share your favorite moments</label>
@@ -66,11 +66,20 @@
 
         <section class="awards-section mb-12 py-8 border-b border-rich-burgundy/10">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="best-photo text-center">
-                    <h2 class="font-serif text-3xl md:text-4xl uppercase tracking-[0.2em] text-rich-burgundy mb-4">Best Photo of the Day</h2>
-                    {{if .BestPhoto.Filename}}
-                    <img src="/uploads/{{.BestPhoto.Filename}}" alt="Best photo of the day" class="w-full h-auto object-cover rounded-lg shadow-md">
-                    <p class="mt-2 text-gray-600">❤ {{.BestPhoto.Likes}}</p>
+                <div class="best-photos text-center">
+                    <h2 class="font-serif text-3xl md:text-4xl uppercase tracking-[0.2em] text-rich-burgundy mb-4">Top 3 Photos of the Day</h2>
+                    {{if .BestPhotos}}
+                    <div class="grid grid-cols-3 gap-2">
+                        {{range .BestPhotos}}
+                        <div class="gallery-item flex flex-col rounded-lg overflow-hidden shadow-md">
+                            <img src="/uploads/{{.Filename}}" alt="Top photo" class="w-full h-auto object-cover cursor-pointer aspect-square"
+                                 onclick="openPreview('{{.Filename}}', '{{.Likes}}', '{{.Uploader}}', '{{$.Username}}')">
+                            <div class="p-2 text-center">
+                                <button onclick="likeImage(this, '{{.Filename}}', true)" class="text-rich-burgundy text-2xl">❤ <span class="like-count">{{.Likes}}</span></button>
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
                     {{else}}
                     <p class="text-gray-600">No photos uploaded today.</p>
                     {{end}}

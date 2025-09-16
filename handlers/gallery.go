@@ -22,7 +22,7 @@ type PageData struct {
 	TotalGuests int
 	TotalPhotos int
 	TotalLikes  int
-	BestPhoto   Photo
+	BestPhotos  []Photo
 	TopGuests   []GuestStats
 }
 
@@ -80,20 +80,29 @@ func Gallery(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
 			}
 		}
 
-		// Find best photo and top guests of the day
-		var bestPhoto Photo
+		// Find best photos and top guests of the day
+		var photosToday []Photo
 		guestLikesToday := make(map[string]int)
 		today := time.Now().Truncate(24 * time.Hour)
 
 		for uploader, p := range gallery {
 			for _, photo := range p {
 				if photo.ModTime.After(today) {
-					if photo.Likes > bestPhoto.Likes {
-						bestPhoto = photo
-					}
+					photosToday = append(photosToday, photo)
 					guestLikesToday[uploader] += photo.Likes
 				}
 			}
+		}
+
+		sort.Slice(photosToday, func(i, j int) bool {
+			return photosToday[i].Likes > photosToday[j].Likes
+		})
+
+		var bestPhotos []Photo
+		if len(photosToday) > 3 {
+			bestPhotos = photosToday[:3]
+		} else {
+			bestPhotos = photosToday
 		}
 
 		var topGuests []GuestStats
@@ -103,8 +112,8 @@ func Gallery(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
 		sort.Slice(topGuests, func(i, j int) bool {
 			return topGuests[i].Likes > topGuests[j].Likes
 		})
-		if len(topGuests) > 2 {
-			topGuests = topGuests[:2]
+		if len(topGuests) > 10 {
+			topGuests = topGuests[:10]
 		}
 
 		data := PageData{
@@ -113,7 +122,7 @@ func Gallery(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
 			TotalGuests: totalGuests,
 			TotalPhotos: totalPhotos,
 			TotalLikes:  totalLikes,
-			BestPhoto:   bestPhoto,
+			BestPhotos:  bestPhotos,
 			TopGuests:   topGuests,
 		}
 
