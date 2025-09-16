@@ -3,11 +3,11 @@ package handlers
 import (
 	"html/template"
 	"net/http"
-	"os"
-	"path/filepath"
 	"sort"
-	"strings"
 	"time"
+
+	"github.com/gorilla/sessions"
+	"gorm.io/gorm"
 )
 
 type GuestStats struct {
@@ -34,106 +34,85 @@ func LoginPageHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, nil)
 }
 
-func GalleryHandler(w http.ResponseWriter, r *http.Request) {
-	username := ""
-	cookie, err := r.Cookie("username")
-	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	username = cookie.Value
+func Gallery(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "session-name")
+		username, ok := session.Values["username"].(string)
+		if !ok || username == "" {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
 
-	tmpl, err := template.ParseFiles("templates/gallery.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	gallery := make(map[string][]Photo)
-	uploadDir := "uploads"
-
-	err = filepath.Walk(uploadDir, func(path string, info os.FileInfo, err error) error {
+		tmpl, err := template.ParseFiles("templates/gallery.html")
 		if err != nil {
-			return err
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
-		if !info.IsDir() {
-			parts := strings.Split(info.Name(), "_")
-			if len(parts) > 1 {
-				uploaderName := parts[0]
-				likesMutex.Lock()
-				likes := photoLikes[info.Name()]
-				likesMutex.Unlock()
-				photo := Photo{
-					Filename: info.Name(),
-					Likes:    likes,
-					ModTime:  info.ModTime(),
+
+		var photos []Photo
+		db.Find(&photos)
+
+		gallery := make(map[string][]Photo)
+		for _, p := range photos {
+			gallery[p.Uploader] = append(gallery[p.Uploader], p)
+		}
+
+		for _, p := range gallery {
+			sort.Slice(p, func(i, j int) bool {
+				if p[i].Likes != p[j].Likes {
+					return p[i].Likes > p[j].Likes
 				}
-				gallery[uploaderName] = append(gallery[uploaderName], photo)
+				return p[i].ModTime.After(p[j].ModTime)
+			})
+		}
+
+		totalGuests := len(gallery)
+		totalPhotos := 0
+		totalLikes := 0
+		for _, p := range gallery {
+			totalPhotos += len(p)
+			for _, photo := range p {
+				totalLikes += photo.Likes
 			}
 		}
-		return nil
-	})
 
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+		// Find best photo and top guests of the day
+		var bestPhoto Photo
+		guestLikesToday := make(map[string]int)
+		today := time.Now().Truncate(24 * time.Hour)
 
-	for _, photos := range gallery {
-		sort.Slice(photos, func(i, j int) bool {
-			if photos[i].Likes != photos[j].Likes {
-				return photos[i].Likes > photos[j].Likes
+		for uploader, p := range gallery {
+			for _, photo := range p {
+				if photo.ModTime.After(today) {
+					if photo.Likes > bestPhoto.Likes {
+						bestPhoto = photo
+					}
+					guestLikesToday[uploader] += photo.Likes
+				}
 			}
-			return photos[i].ModTime.After(photos[j].ModTime)
+		}
+
+		var topGuests []GuestStats
+		for name, likes := range guestLikesToday {
+			topGuests = append(topGuests, GuestStats{Name: name, Likes: likes})
+		}
+		sort.Slice(topGuests, func(i, j int) bool {
+			return topGuests[i].Likes > topGuests[j].Likes
 		})
-	}
-
-	totalGuests := len(gallery)
-	totalPhotos := 0
-	totalLikes := 0
-	for _, photos := range gallery {
-		totalPhotos += len(photos)
-		for _, photo := range photos {
-			totalLikes += photo.Likes
+		if len(topGuests) > 2 {
+			topGuests = topGuests[:2]
 		}
-	}
 
-	// Find best photo and top guests of the day
-	var bestPhoto Photo
-	guestLikesToday := make(map[string]int)
-	today := time.Now().Truncate(24 * time.Hour)
-
-	for uploader, photos := range gallery {
-		for _, photo := range photos {
-			if photo.ModTime.After(today) {
-				if photo.Likes > bestPhoto.Likes {
-					bestPhoto = photo
-				}
-				guestLikesToday[uploader] += photo.Likes
-			}
+		data := PageData{
+			Username:    username,
+			Gallery:     gallery,
+			TotalGuests: totalGuests,
+			TotalPhotos: totalPhotos,
+			TotalLikes:  totalLikes,
+			BestPhoto:   bestPhoto,
+			TopGuests:   topGuests,
 		}
-	}
 
-	var topGuests []GuestStats
-	for name, likes := range guestLikesToday {
-		topGuests = append(topGuests, GuestStats{Name: name, Likes: likes})
+		tmpl.Execute(w, data)
 	}
-	sort.Slice(topGuests, func(i, j int) bool {
-		return topGuests[i].Likes > topGuests[j].Likes
-	})
-	if len(topGuests) > 2 {
-		topGuests = topGuests[:2]
-	}
-
-	data := PageData{
-		Username:    username,
-		Gallery:     gallery,
-		TotalGuests: totalGuests,
-		TotalPhotos: totalPhotos,
-		TotalLikes:  totalLikes,
-		BestPhoto:   bestPhoto,
-		TopGuests:   topGuests,
-	}
-
-	tmpl.Execute(w, data)
 }

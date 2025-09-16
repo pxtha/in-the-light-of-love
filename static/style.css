@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Montserrat:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
 
 body {
     background-color: #6A0E29; /* Deep Red Background */
@@ -46,6 +47,10 @@ h1, h2, h3, h4, h5, h6, .font-serif {
 
 .swiper-button-next, .swiper-button-prev {
     color: #6A0E29 !important;
+}
+
+.font-vietnamese {
+    font-family: 'Noto Sans', sans-serif;
 }
 
 /* Animation for login page */

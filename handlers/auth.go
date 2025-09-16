@@ -2,37 +2,37 @@ package handlers
 
 import (
 	"net/http"
-	"time"
+
+	"github.com/gorilla/sessions"
 )
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
+func Login(store *sessions.CookieStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
 
-	name := r.FormValue("name")
-	if name == "" {
-		http.Error(w, "Name is required", http.StatusBadRequest)
-		return
-	}
+		name := r.FormValue("name")
+		if name == "" {
+			http.Error(w, "Name is required", http.StatusBadRequest)
+			return
+		}
 
-	cookie := http.Cookie{
-		Name:    "username",
-		Value:   name,
-		Expires: time.Now().Add(24 * time.Hour),
-		Path:    "/",
+		session, _ := store.Get(r, "session-name")
+		session.Values["username"] = name
+		session.Save(r, w)
+
+		http.Redirect(w, r, "/gallery", http.StatusSeeOther)
 	}
-	http.SetCookie(w, &cookie)
-	http.Redirect(w, r, "/gallery", http.StatusSeeOther)
 }
 
-func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	cookie := http.Cookie{
-		Name:   "username",
-		Value:  "",
-		MaxAge: -1,
+func Logout(store *sessions.CookieStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "session-name")
+		session.Values["username"] = ""
+		session.Options.MaxAge = -1
+		session.Save(r, w)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
-	http.SetCookie(w, &cookie)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

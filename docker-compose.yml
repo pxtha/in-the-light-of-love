@@ -5,3 +5,4 @@ services:
       - "8080:8080"
     volumes:
       - ./uploads:/app/uploads
+      - ./itlol.db:/app/itlol.db
