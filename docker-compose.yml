@@ -1,6 +1,7 @@
 services:
   web:
     image: registry.digitalocean.com/praslar/in-the-light-of-love:${VERSION}
+    restart: always
     ports:
       - "8080:8080"
     volumes:
