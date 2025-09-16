@@ -95,9 +95,12 @@
                 <h2 class="font-serif text-3xl md:text-4xl uppercase tracking-[0.2em] text-rich-burgundy text-center mb-8 font-vietnamese">{{$uploader}}'s Photos</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
                     {{range .}}
-                    <div class="gallery-item relative group rounded-lg overflow-hidden shadow-md aspect-square" 
-                         onclick="openPreview('{{.Filename}}', '{{.Likes}}', '{{$uploader}}', '{{$.Username}}')">
-                        <img src="/uploads/{{.Filename}}" alt="Photo by {{$uploader}}" class="w-full h-full object-cover cursor-pointer">
+                    <div class="gallery-item flex flex-col rounded-lg overflow-hidden shadow-md">
+                        <img src="/uploads/{{.Filename}}" alt="Photo by {{$uploader}}" class="w-full h-auto object-cover cursor-pointer aspect-square"
+                             onclick="openPreview('{{.Filename}}', '{{.Likes}}', '{{$uploader}}', '{{$.Username}}')">
+                        <div class="p-2 text-center">
+                            <button onclick="likeImage(this, '{{.Filename}}', true)" class="text-rich-burgundy text-2xl">❤ <span class="like-count">{{.Likes}}</span></button>
+                        </div>
                     </div>
                     {{end}}
                 </div>
@@ -107,21 +110,77 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', () => {
+                const previewModal = document.getElementById('preview-modal');
+                const previewImage = document.getElementById('preview-image');
+                const previewActions = document.getElementById('preview-actions');
+                const closePreviewBtn = document.getElementById('close-preview-btn');
+
+                window.openPreview = function(filename, likes, uploader, currentUser) {
+                    previewImage.src = '/uploads/' + filename;
+                    previewActions.innerHTML = '';
+
+                    const likeButton = document.createElement('button');
+                    likeButton.className = 'text-rich-burgundy text-3xl p-2';
+                    likeButton.innerHTML = `❤ <span class="like-count">${likes}</span>`;
+                    likeButton.onclick = () => window.likeImage(likeButton, filename, false);
+                    previewActions.appendChild(likeButton);
+
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = '/uploads/' + filename;
+                    downloadLink.download = true;
+                    downloadLink.className = 'text-rich-burgundy p-2';
+                    downloadLink.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>`;
+                    previewActions.appendChild(downloadLink);
+
+                    const shareButton = document.createElement('button');
+                    shareButton.className = 'text-rich-burgundy p-2';
+                    shareButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6.002l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.368a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" /></svg>`;
+                    shareButton.onclick = () => window.shareImage(filename);
+                    previewActions.appendChild(shareButton);
+
+                    if (uploader === currentUser) {
+                        const deleteButton = document.createElement('button');
+                        deleteButton.className = 'text-rich-burgundy p-2';
+                        deleteButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>`;
+                        deleteButton.onclick = () => window.deleteImage(deleteButton, filename);
+                        previewActions.appendChild(deleteButton);
+                    }
+
+                    previewModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        previewModal.classList.remove('opacity-0');
+                        previewModal.querySelector('div').classList.remove('scale-95');
+                    }, 10);
+                }
+
+                function closePreview() {
+                    previewModal.classList.add('opacity-0');
+                    previewModal.querySelector('div').classList.add('scale-95');
+                    setTimeout(() => {
+                        previewModal.classList.add('hidden');
+                    }, 300);
+                }
+
+                closePreviewBtn.onclick = closePreview;
+                previewModal.addEventListener('click', (e) => {
+                    if (e.target === previewModal) {
+                        closePreview();
+                    }
+                });
+
                 const photoInput = document.getElementById('photos');
                 const sizeInfo = document.getElementById('upload-size-info');
                 const errorInfo = document.getElementById('upload-error');
                 const uploadBtn = document.getElementById('upload-btn');
-                const MAX_SIZE = 100 * 1024 * 1024; // 100 MB
+                const MAX_SIZE = 100 * 1024 * 1024;
 
                 photoInput.addEventListener('change', () => {
                     let totalSize = 0;
                     for (const file of photoInput.files) {
                         totalSize += file.size;
                     }
-
                     const totalSizeMB = (totalSize / 1024 / 1024).toFixed(2);
                     sizeInfo.textContent = `Selected: ${totalSizeMB} MB / 100 MB`;
-
                     if (totalSize > MAX_SIZE) {
                         errorInfo.classList.remove('hidden');
                         uploadBtn.disabled = true;
@@ -134,79 +193,35 @@
                 });
             });
 
-            const previewModal = document.getElementById('preview-modal');
-            const previewImage = document.getElementById('preview-image');
-            const previewActions = document.getElementById('preview-actions');
-            const closePreviewBtn = document.getElementById('close-preview-btn');
-
-            function openPreview(filename, likes, uploader, currentUser) {
-                previewImage.src = '/uploads/' + filename;
-                
-                // Clear previous actions
-                previewActions.innerHTML = '';
-
-                // Add Like button
-                const likeButton = document.createElement('button');
-                likeButton.className = 'text-rich-burgundy text-3xl p-2';
-                likeButton.innerHTML = `❤ <span class="like-count">${likes}</span>`;
-                likeButton.onclick = () => likeImage(likeButton, filename);
-                previewActions.appendChild(likeButton);
-
-                // Add Download button
-                const downloadLink = document.createElement('a');
-                downloadLink.href = '/uploads/' + filename;
-                downloadLink.download = true;
-                downloadLink.className = 'text-rich-burgundy p-2';
-                downloadLink.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>`;
-                previewActions.appendChild(downloadLink);
-
-                // Add Share button
-                const shareButton = document.createElement('button');
-                shareButton.className = 'text-rich-burgundy p-2';
-                shareButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6.002l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.368a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" /></svg>`;
-                shareButton.onclick = () => shareImage(filename);
-                previewActions.appendChild(shareButton);
-
-                // Add Delete button if the current user is the uploader
-                if (uploader === currentUser) {
-                    const deleteButton = document.createElement('button');
-                    deleteButton.className = 'text-rich-burgundy p-2';
-                    deleteButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>`;
-                    deleteButton.onclick = () => deleteImage(deleteButton, filename);
-                    previewActions.appendChild(deleteButton);
-                }
-
-                previewModal.classList.remove('hidden');
-            }
-
-            closePreviewBtn.onclick = () => {
-                previewModal.classList.add('hidden');
-            };
-
-            window.likeImage = function(button, filename) {
+            window.likeImage = function(button, filename, isGrid) {
                 const formData = new FormData();
                 formData.append('filename', filename);
-
                 fetch('/like', {
                     method: 'POST',
                     body: formData,
                 })
                 .then(response => response.json())
                 .then(data => {
+                    // Update the like count on the button that was clicked
                     button.querySelector('.like-count').textContent = data.likes;
-                    // Also update the like count in the main grid if it exists
-                    const gridItem = document.querySelector(`[onclick*="'${filename}'"]`);
-                    if (gridItem) {
-                        const gridLikeCount = gridItem.querySelector('.like-count');
-                        if (gridLikeCount) {
-                            gridLikeCount.textContent = data.likes;
+
+                    // If the like came from the grid, also update the modal if it's open
+                    if (isGrid) {
+                        const modalLikeButton = document.querySelector('#preview-actions button');
+                        if (modalLikeButton && document.getElementById('preview-image').src.includes(filename)) {
+                            modalLikeButton.querySelector('.like-count').textContent = data.likes;
+                        }
+                    } else { // If the like came from the modal, also update the grid
+                        const gridItem = document.querySelector(`.gallery-item[onclick*="'${filename}'"]`);
+                        if (gridItem) {
+                            gridItem.querySelector('.like-count').textContent = data.likes;
                         }
                     }
                 })
                 .catch(error => console.error('Error:', error));
             }
 
-            function shareImage(filename) {
+            window.shareImage = function(filename) {
                 if (navigator.share) {
                     navigator.share({
                         title: 'In the Light of Love',
@@ -230,19 +245,17 @@
                 const confirmHandler = () => {
                     const formData = new FormData();
                     formData.append('filename', filename);
-
                     fetch('/delete', {
                         method: 'POST',
                         body: formData,
                     })
                     .then(response => {
                         if (response.ok) {
-                            // On success, remove the image from the grid and close the preview
                             const gridItem = document.querySelector(`[onclick*="'${filename}'"]`);
                             if (gridItem) {
                                 gridItem.remove();
                             }
-                            previewModal.classList.add('hidden');
+                            document.getElementById('preview-modal').classList.add('hidden');
                         } else {
                             alert('Error deleting photo. You may not have permission.');
                         }
@@ -278,10 +291,12 @@
         </footer>
 
         <!-- Image Preview Modal -->
-        <div id="preview-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 hidden z-50">
-            <div class="bg-ivory-cream p-4 rounded-lg shadow-lg max-w-4xl max-h-full w-full h-full flex flex-col">
-                <img id="preview-image" src="" alt="Preview" class="w-full h-full object-contain">
-                <div id="preview-actions" class="flex justify-center items-center space-x-4 p-4">
+        <div id="preview-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 hidden z-50 opacity-0 transition-opacity duration-300">
+            <div class="bg-ivory-cream p-4 rounded-lg shadow-lg max-w-[90vw] max-h-[85vh] flex flex-col transform transition-all duration-300 scale-95">
+                <div class="flex-grow relative flex items-center justify-center overflow-hidden">
+                    <img id="preview-image" src="" alt="Preview" class="max-w-full max-h-full object-contain" style="max-height: calc(85vh - 100px);">
+                </div>
+                <div id="preview-actions" class="flex-shrink-0 flex justify-center items-center space-x-4 p-4">
                     <!-- Action buttons will be dynamically inserted here -->
                 </div>
             </div>
