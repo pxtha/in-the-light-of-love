@@ -5,6 +5,9 @@ import (
 	"in-the-light-of-love/handlers"
 	"log"
 	"net/http"
+	"os"
+	"strings"
+	_ "time"
 
 	"github.com/gorilla/sessions"
 	"gorm.io/driver/sqlite"
@@ -23,6 +26,9 @@ func main() {
 	if err != nil {
 		log.Fatal("failed to migrate database schema")
 	}
+
+	// Repopulate database from uploads folder
+	repopulateDbFromUploads(db)
 
 	store := sessions.NewCookieStore([]byte("super-secret-key"))
 
@@ -43,4 +49,38 @@ func main() {
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func repopulateDbFromUploads(db *gorm.DB) {
+	uploadDir := "uploads"
+	files, err := os.ReadDir(uploadDir)
+	if err != nil {
+		log.Printf("Could not read uploads directory: %v. This might be expected if the directory doesn't exist yet.", err)
+		return
+	}
+
+	for _, file := range files {
+		if !file.IsDir() {
+			fileName := file.Name()
+			parts := strings.SplitN(fileName, "_", 2)
+			if len(parts) == 2 {
+				uploader := parts[0]
+
+				fileInfo, err := file.Info()
+				if err != nil {
+					log.Printf("Could not get file info for %s: %v", fileName, err)
+					continue
+				}
+
+				photo := handlers.Photo{
+					Filename: fileName,
+					Uploader: uploader,
+					Likes:    0, // Likes are not stored in filenames, so they reset
+					ModTime:  fileInfo.ModTime(),
+				}
+				db.Create(&photo)
+			}
+		}
+	}
+	log.Println("Successfully repopulated database from uploads folder.")
 }
