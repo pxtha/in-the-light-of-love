@@ -17,7 +17,8 @@ func main() {
 		log.Fatal("failed to connect database")
 	}
 
-	// Migrate the schema
+	// Drop the table to clear all data on restart, then recreate it.
+	db.Migrator().DropTable(&handlers.Photo{})
 	err = db.AutoMigrate(&handlers.Photo{})
 	if err != nil {
 		log.Fatal("failed to migrate database schema")
