@@ -20,6 +20,7 @@ COPY --from=go-builder /in-the-light-of-love .
 COPY --from=go-builder /app/static ./static
 COPY --from=go-builder /app/templates ./templates
 COPY --from=go-builder /app/uploads ./uploads
+COPY gallery.db .
 
 EXPOSE 8080
 CMD ["/app/in-the-light-of-love"]
