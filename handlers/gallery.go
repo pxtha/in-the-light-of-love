@@ -3,6 +3,7 @@ package handlers
 import (
 	"html/template"
 	"net/http"
+	"os"
 	"sort"
 	"time"
 
@@ -54,7 +55,10 @@ func Gallery(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
 
 		gallery := make(map[string][]Photo)
 		for _, p := range photos {
-			gallery[p.Uploader] = append(gallery[p.Uploader], p)
+			// Check if the photo file exists before adding it to the gallery
+			if _, err := os.Stat("uploads/" + p.Filename); err == nil {
+				gallery[p.Uploader] = append(gallery[p.Uploader], p)
+			}
 		}
 
 		for _, p := range gallery {
