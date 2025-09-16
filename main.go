@@ -21,7 +21,7 @@ func main() {
 	}
 
 	// Drop the table to clear all data on restart, then recreate it.
-	db.Migrator().DropTable(&handlers.Photo{})
+	// db.Migrator().DropTable(&handlers.Photo{})
 	err = db.AutoMigrate(&handlers.Photo{})
 	if err != nil {
 		log.Fatal("failed to migrate database schema")
@@ -78,7 +78,11 @@ func repopulateDbFromUploads(db *gorm.DB) {
 					Likes:    0, // Likes are not stored in filenames, so they reset
 					ModTime:  fileInfo.ModTime(),
 				}
-				db.Create(&photo)
+				// Check if the photo already exists in the database
+				var existingPhoto handlers.Photo
+				if db.First(&existingPhoto, "filename = ?", fileName).Error == gorm.ErrRecordNotFound {
+					db.Create(&photo)
+				}
 			}
 		}
 	}

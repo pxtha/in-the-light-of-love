@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thang & Quynh | In the Light of Love</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/themes/odometer-theme-default.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.js"></script>
     <link rel="stylesheet" href="/static/style.css">
     <script>
     tailwind.config = {
@@ -31,9 +33,6 @@
             <img src="/static/2-cats.2.jpg" alt="Cat Logo" class="w-24 h-24 mx-auto mb-4 rounded-full">
             <h1 class="font-serif text-5xl md:text-6xl uppercase tracking-[0.2em] text-rich-burgundy">Gallery</h1>
             <p class="mt-4 text-gray-600 font-vietnamese">Welcome, {{.Username}}! | <a href="/logout" class="text-rich-burgundy hover:text-rich-burgundy/80 underline">Logout</a></p>
-            <nav class="mt-4">
-                <a href="/gallery" class="text-rich-burgundy hover:text-rich-burgundy/80 underline p-2">Gallery</a>
-            </nav>
         </header>
 
         <section class="upload-section mb-12 max-w-xl mx-auto py-8 border-b border-rich-burgundy/10">
@@ -46,6 +45,23 @@
                 </div>
                 <button id="upload-btn" type="submit" class="w-full bg-rich-burgundy text-ivory-cream hover:bg-rich-burgundy/90 font-bold py-2 px-4 rounded-lg">Upload Photos</button>
             </form>
+        </section>
+        
+        <section class="stats-section text-center mb-12 py-8 border-b border-rich-burgundy/10">
+            <div class="flex justify-around">
+                <div class="stat">
+                    <div class="text-gray-600 uppercase tracking-widest">Guests</div>
+                    <div id="total-guests" class="odometer text-rich-burgundy text-4xl font-bold" data-target="{{.TotalGuests}}">0</div>
+                </div>
+                <div class="stat">
+                    <div class="text-gray-600 uppercase tracking-widest">Photos</div>
+                    <div id="total-photos" class="odometer text-rich-burgundy text-4xl font-bold" data-target="{{.TotalPhotos}}">0</div>
+                </div>
+                <div class="stat">
+                    <div class="text-gray-600 uppercase tracking-widest">Likes</div>
+                    <div id="total-likes" class="odometer text-rich-burgundy text-4xl font-bold" data-target="{{.TotalLikes}}">0</div>
+                </div>
+            </div>
         </section>
 
         <section class="awards-section mb-12 py-8 border-b border-rich-burgundy/10">
@@ -72,22 +88,7 @@
             </div>
         </section>
 
-        <section class="stats-section text-center mb-12 py-8 border-b border-rich-burgundy/10">
-            <div class="flex justify-around">
-                <div class="stat">
-                    <div class="text-gray-600 uppercase tracking-widest">Guests</div>
-                    <div class="text-rich-burgundy text-4xl font-bold">{{.TotalGuests}}</div>
-                </div>
-                <div class="stat">
-                    <div class="text-gray-600 uppercase tracking-widest">Photos</div>
-                    <div class="text-rich-burgundy text-4xl font-bold">{{.TotalPhotos}}</div>
-                </div>
-                <div class="stat">
-                    <div class="text-gray-600 uppercase tracking-widest">Likes</div>
-                    <div class="text-rich-burgundy text-4xl font-bold">{{.TotalLikes}}</div>
-                </div>
-            </div>
-        </section>
+
 
         <section class="gallery-section">
             {{range $uploader, $photos := .Gallery}}
@@ -174,6 +175,17 @@
                 const uploadBtn = document.getElementById('upload-btn');
                 const MAX_SIZE = 100 * 1024 * 1024;
 
+                setTimeout(function(){
+                    const totalGuests = document.getElementById('total-guests');
+                    const totalPhotos = document.getElementById('total-photos');
+                    const totalLikes = document.getElementById('total-likes');
+
+                    totalGuests.innerHTML = totalGuests.dataset.target;
+                    totalPhotos.innerHTML = totalPhotos.dataset.target;
+                    totalLikes.innerHTML = totalLikes.dataset.target;
+                }, 1000);
+
+
                 photoInput.addEventListener('change', () => {
                     let totalSize = 0;
                     for (const file of photoInput.files) {
@@ -251,11 +263,7 @@
                     })
                     .then(response => {
                         if (response.ok) {
-                            const gridItem = document.querySelector(`[onclick*="'${filename}'"]`);
-                            if (gridItem) {
-                                gridItem.remove();
-                            }
-                            document.getElementById('preview-modal').classList.add('hidden');
+                            location.reload();
                         } else {
                             alert('Error deleting photo. You may not have permission.');
                         }
@@ -284,9 +292,6 @@
                 <img src="/qr" alt="QR Code for Gallery" class="bg-white p-2 w-48 h-48">
             </div>
             <h2 class="font-serif text-2xl uppercase tracking-[0.2em] text-rich-burgundy mb-4">Share the Gallery</h2>
-            <form action="/clear" method="post" class="mb-4">
-                <button type="submit" class="text-sm text-rich-burgundy hover:text-rich-burgundy/80 underline">Clear My Photos</button>
-            </form>
             <p class="text-sm text-gray-600">Website created by Thang Pham, with help of AI</p>
         </footer>
 

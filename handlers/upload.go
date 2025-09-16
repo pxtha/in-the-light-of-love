@@ -37,7 +37,8 @@ func Upload(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
 			}
 			defer file.Close()
 
-			fileName := fmt.Sprintf("%s_%s", username, fileHeader.Filename)
+			ext := filepath.Ext(fileHeader.Filename)
+			fileName := fmt.Sprintf("%s_%d%s", username, time.Now().UnixNano(), ext)
 			filePath := filepath.Join("uploads", fileName)
 
 			dst, err := os.Create(filePath)
